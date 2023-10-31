@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: mynode-app
+    command: npm run dev
+    volumes:
+      - ./server/:/usr/src/app
+    ports:
+      - "1111:1111"
+    depends_on:
+      - mongo
+    env_file: ./server/.env
+    environment:
+      - NODE_ENV=development
+
+  mongo:
+    image: mongo
+    volumes:
+      - data-volume:/data/db
+    ports:
+      - "27017:27017"
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: myreact-app
+    command: npm start
+    volumes:
+      - ./client/:/usr/src/app
+    depends_on:
+      - server
+    ports:
+      - "3000:3000"
+
+volumes:
+  data-volume:
